@@ -1,9 +1,17 @@
-import React, { useState } from 'react';
-import { ShieldCheck, Lock, Mail, Store, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import React, { useState } from "react";
+import {
+  ShieldCheck,
+  Lock,
+  Mail,
+  Store,
+  ArrowRight,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 
 export default function LoginPage({ onLogin }) {
-  const [email, setEmail] = useState('wahajwahaj200@gmail.com');
-  const [password, setPassword] = useState('Admin@Pak2026!');
+  const [email, setEmail] = useState("wahajwahaj200@gmail.com");
+  const [password, setPassword] = useState("Admin@Pak2026!");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -13,10 +21,11 @@ export default function LoginPage({ onLogin }) {
 
     setTimeout(() => {
       onLogin({
-        email: email || 'wahajwahaj200@gmail.com',
-        name: 'Wahaj Ahmed',
-        role: 'Admin',
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'
+        email: email || "wahajwahaj200@gmail.com",
+        name: "Wahaj Ahmed",
+        role: "Admin",
+        avatar:
+          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80",
       });
       setIsLoading(false);
     }, 400);
@@ -31,24 +40,31 @@ export default function LoginPage({ onLogin }) {
             <Store className="w-6 h-6" />
           </div>
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
-            CommerceCore Admin
+            E-Commerce Admin 
           </h1>
           <p className="text-xs text-slate-400 mt-1">
-            Pakistan E-Commerce Management Platform
+            E-Commerce Management Platform
           </p>
         </div>
 
         {/* Login Card */}
         <div className="bg-slate-800/95 border border-slate-700/80 rounded-xl p-6 sm:p-7 shadow-xl">
           <div className="mb-4">
-            <h2 className="text-sm font-bold text-white">Sign In to Dashboard</h2>
-            <p className="text-xs text-slate-400 mt-0.5">Enter your administrative credentials</p>
+            <h2 className="text-sm font-bold text-white">
+              Sign In to Dashboard
+            </h2>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Enter your administrative credentials
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email Field */}
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1" htmlFor="login-email">
+              <label
+                className="block text-xs font-semibold text-slate-300 mb-1"
+                htmlFor="login-email"
+              >
                 Email Address
               </label>
               <div className="relative">
@@ -69,7 +85,10 @@ export default function LoginPage({ onLogin }) {
 
             {/* Password Field */}
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1" htmlFor="login-password">
+              <label
+                className="block text-xs font-semibold text-slate-300 mb-1"
+                htmlFor="login-password"
+              >
                 Password
               </label>
               <div className="relative">
@@ -78,7 +97,7 @@ export default function LoginPage({ onLogin }) {
                 </div>
                 <input
                   id="login-password"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -90,7 +109,11 @@ export default function LoginPage({ onLogin }) {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-200 cursor-pointer"
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
                 </button>
               </div>
             </div>
@@ -99,7 +122,8 @@ export default function LoginPage({ onLogin }) {
             <div className="rounded-lg p-2.5 bg-slate-900/70 border border-slate-700/60 flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
               <span className="text-slate-300 text-[11px]">
-                Secured session with full Admin privileges and 256-bit encryption.
+                Secured session with full Admin privileges and 256-bit
+                encryption.
               </span>
             </div>
 

@@ -19,10 +19,9 @@ import {
 import { CheckCircle2 } from "lucide-react";
 
 export default function App() {
-  // Authentication state (Pakistani Admin profile)
   const [currentUser, setCurrentUser] = useState({
     email: "wahajwahaj200@gmail.com",
-    name: "Wahaj Ahmed",
+    name: "Muhammad Wahaj",
     role: "Admin",
     avatar:
       "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80",

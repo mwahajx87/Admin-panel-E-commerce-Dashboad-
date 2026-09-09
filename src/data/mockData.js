@@ -235,7 +235,7 @@ export const INITIAL_ORDERS = [
 export const INITIAL_USERS = [
   {
     id: "usr-1",
-    name: "Wahaj Ahmed",
+    name: "Muhammad Wahaj",
     email: "wahajwahaj200@gmail.com",
     role: "Admin",
     joinedDate: "2025-01-10",
