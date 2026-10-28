@@ -134,7 +134,7 @@ export default function Dashboard({
             <h2 className="text-xl font-bold text-slate-800 tracking-tight">
               Welcome back, {currentUser?.name}
             </h2>
-            <span
+            {/* <span
               className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
                 currentUser?.role === 'Admin'
                   ? 'bg-emerald-100 text-emerald-700'
@@ -142,7 +142,7 @@ export default function Dashboard({
               }`}
             >
               {currentUser?.role === 'Admin' ? 'Admin Access' : 'View-Only User'}
-            </span>
+            </span> */}
           </div>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
             {currentUser?.role === 'Admin'

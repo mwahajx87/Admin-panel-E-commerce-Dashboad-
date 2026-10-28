@@ -70,7 +70,7 @@ export default function Sidebar({
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-50 flex flex-col bg-slate-900 border-r border-slate-800 transition-all duration-300 ease-in-out lg:static ${
+        className={`fixed h-screen top-0 bottom-0 left-0 z-50 flex flex-col bg-slate-900 border-r border-slate-800 transition-all duration-300 ease-in-out lg:static ${
           mobileOpen
             ? "translate-x-0 w-72"
             : "-translate-x-full lg:translate-x-0"
@@ -84,7 +84,7 @@ export default function Sidebar({
                 A
               </div>
               <span className="text-lg font-bold tracking-tight text-white">
-                Admin Panel
+                Admin
               </span>
             </div>
           )}
@@ -112,7 +112,7 @@ export default function Sidebar({
         </div>
 
         {/* Role Status Ribbon (when expanded) */}
-        {!isCollapsed && (
+        {/* {!isCollapsed && (
           <div className="px-3.5 py-2.5 mx-3 my-2.5 rounded-lg bg-slate-800/80 border border-slate-700/60">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
@@ -143,7 +143,7 @@ export default function Sidebar({
                 : "Action buttons disabled across views"}
             </p>
           </div>
-        )}
+        )} */}
 
         {/* Navigation List */}
         <nav className="flex-1 py-4 px-3 space-y-1.5 overflow-y-auto">

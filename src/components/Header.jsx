@@ -113,7 +113,7 @@ export default function Header({
       {/* Right side: Role badge, notifications, user avatar */}
       <div className="flex items-center gap-4">
         {/* Role Pill */}
-        <div
+        {/* <div
           id="header-role-badge"
           className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
             currentUser?.role === 'Admin'
@@ -123,7 +123,7 @@ export default function Header({
         >
           <span className={`w-1.5 h-1.5 rounded-full ${currentUser?.role === 'Admin' ? 'bg-emerald-500' : 'bg-indigo-500'} animate-pulse`}></span>
           <span>{currentUser?.role === 'Admin' ? 'Admin Access' : 'User Access'}</span>
-        </div>
+        </div> */}
 
         {/* Notifications Dropdown */}
         <div className="relative">
