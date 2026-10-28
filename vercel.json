@@ -1,3 +1,11 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/" }]
+  "buildCommand": "vite build --outDir dist/admin --emptyOutDir",
+  "outputDirectory": "dist",
+  "redirects": [
+    { "source": "/", "destination": "/admin", "permanent": false }
+  ],
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "https://<BACKEND_HOST>/api/:path*" },
+    { "source": "/admin/:path*", "destination": "/admin/index.html" }
+  ]
 }

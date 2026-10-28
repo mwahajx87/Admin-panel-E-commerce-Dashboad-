@@ -22,9 +22,10 @@ npm run dev
 The admin Vite server runs on port 5174 and proxies `/api` to port 5000. The
 workspace root README documents production build and start commands.
 
-For its standalone Vercel deployment, set `VITE_ADMIN_BASE_PATH=/` and
-`VITE_API_BASE_URL` to the deployed backend's `/api` URL. The standalone
-deployment must be rebuilt after changing these Vercel environment variables.
+For its standalone Vercel deployment, keep `VITE_ADMIN_BASE_PATH=/admin`
+(the default) and leave `VITE_API_BASE_URL` unset so the app calls its own
+`/api` route. The standalone deployment must be rebuilt after changing these
+Vercel environment variables.
 
 ## Admin API
 

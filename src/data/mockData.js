@@ -238,15 +238,6 @@ export const INITIAL_ORDERS = [
 
 export const INITIAL_USERS = [
   {
-    id: "usr-1",
-    name: "Muhammad Wahaj",
-    email: "wahajwahaj200@gmail.com",
-    role: "Admin",
-    joinedDate: "2025-01-10",
-    status: "Active",
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80"
-  },
-  {
     id: "usr-2",
     name: "Fatima Zahra",
     email: "fatima.zahra@gmail.com",
