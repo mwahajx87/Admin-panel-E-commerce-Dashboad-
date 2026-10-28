@@ -5,7 +5,10 @@
     { "source": "/", "destination": "/admin", "permanent": false }
   ],
   "rewrites": [
-    { "source": "/api/:path*", "destination": "https://<BACKEND_HOST>/api/:path*" },
+    {
+      "source": "/api/:path*",
+      "destination": "https://ecommerce-backend-nine-zeta.vercel.app/api/:path*"
+    },
     { "source": "/admin/:path*", "destination": "/admin/index.html" }
   ]
 }

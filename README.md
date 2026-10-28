@@ -2,9 +2,9 @@
 
 Live admin panel: https://admin-panel-e-commerce-dashboad.vercel.app/.
 
-The admin app can be served at `/admin` by the shared Express backend or at
-the root of its own domain. It uses the same MongoDB database as the storefront
-and authenticates administrators through `/api/auth`.
+The admin app is deployed separately and can be routed through the storefront
+at `https://e-commerce-website-react-js-phi.vercel.app/admin`. It authenticates
+administrators through the backend API.
 
 ## Development
 
@@ -22,10 +22,39 @@ npm run dev
 The admin Vite server runs on port 5174 and proxies `/api` to port 5000. The
 workspace root README documents production build and start commands.
 
-For its standalone Vercel deployment, keep `VITE_ADMIN_BASE_PATH=/admin`
-(the default) and leave `VITE_API_BASE_URL` unset so the app calls its own
-`/api` route. The standalone deployment must be rebuilt after changing these
-Vercel environment variables.
+For the admin Vercel deployment, keep `VITE_ADMIN_BASE_PATH=/admin` (the
+default) and leave `VITE_API_BASE_URL` unset. Its `/api` route proxies to the
+backend configured in `vercel.json`.
+
+To serve the separate admin deployment at the storefront URL, add these
+rewrites to the storefront project's `vercel.json` before its catch-all
+rewrite. Keep its `/api` rewrite pointed at the same backend:
+
+```json
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://ecommerce-backend-nine-zeta.vercel.app/api/:path*"
+    },
+    {
+      "source": "/admin",
+      "destination": "https://admin-panel-e-commerce-dashboad.vercel.app/admin"
+    },
+    {
+      "source": "/admin/:path*",
+      "destination": "https://admin-panel-e-commerce-dashboad.vercel.app/admin/:path*"
+    },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
+```
+
+The storefront `/api` rewrite is needed because browser API calls remain on
+the storefront origin. Do not configure the production backend as
+`localhost:5000`; localhost is only reachable from the developer's computer.
+After deploying the storefront rewrite, check `/admin/login` and confirm
+`/api/auth/me` responds from the backend.
 
 ## Admin API
 
