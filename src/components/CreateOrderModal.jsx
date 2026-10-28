@@ -17,7 +17,7 @@ export default function CreateOrderModal({ isOpen, onClose, products, onSubmitOr
   const [customerName, setCustomerName] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
   const [customerAddress, setCustomerAddress] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('Cash on Delivery (COD)');
+  const paymentMethod = 'Cash on delivery';
 
   // Dynamic Line items state
   const [selectedProductId, setSelectedProductId] = useState(products[0]?.id || '');
@@ -67,6 +67,11 @@ export default function CreateOrderModal({ isOpen, onClose, products, onSubmitOr
 
     // Check if item already exists in lineItems
     const existingIndex = lineItems.findIndex((item) => item.productId === currentProduct.id);
+    const existingQuantity = existingIndex > -1 ? lineItems[existingIndex].quantity : 0;
+    if (existingQuantity + itemQuantity > currentProduct.stock) {
+      setError(`Only ${currentProduct.stock - existingQuantity} more unit(s) of ${currentProduct.name} are available.`);
+      return;
+    }
     if (existingIndex > -1) {
       const updated = [...lineItems];
       const newQty = updated[existingIndex].quantity + itemQuantity;
@@ -99,6 +104,11 @@ export default function CreateOrderModal({ isOpen, onClose, products, onSubmitOr
         .map((item) => {
           if (item.productId === productId) {
             const newQty = item.quantity + delta;
+            const product = products.find((entry) => entry.id === productId);
+            if (product && newQty > product.stock) {
+              setError(`Only ${product.stock} unit(s) of ${product.name} are available.`);
+              return item;
+            }
             return newQty > 0 ? { ...item, quantity: newQty } : null;
           }
           return item;
@@ -115,18 +125,11 @@ export default function CreateOrderModal({ isOpen, onClose, products, onSubmitOr
     }
 
     const newOrder = {
-      id: `ORD-PK-${Math.floor(1000 + Math.random() * 9000)}`,
       customerName,
       customerEmail,
       customerAddress,
-      date: new Date().toISOString().split('T')[0],
-      items: lineItems,
-      subtotal,
-      tax,
-      shipping,
-      total: grandTotal,
       paymentMethod,
-      status: 'Pending'
+      items: lineItems.map(({ productId, quantity }) => ({ productId, quantity })),
     };
 
     onSubmitOrder(newOrder);
@@ -224,13 +227,10 @@ export default function CreateOrderModal({ isOpen, onClose, products, onSubmitOr
                 <select
                   id="order-payment-method"
                   value={paymentMethod}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
+                  disabled
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
                 >
-                  <option value="Cash on Delivery (COD)">Cash on Delivery (COD)</option>
-                  <option value="JazzCash">JazzCash</option>
-                  <option value="EasyPaisa">EasyPaisa</option>
-                  <option value="Raast / Bank Transfer">Raast / Bank Transfer</option>
+                  <option value={paymentMethod}>Cash on delivery</option>
                 </select>
               </div>
             </div>

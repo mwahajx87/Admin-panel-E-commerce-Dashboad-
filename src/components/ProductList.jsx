@@ -26,9 +26,12 @@ export default function ProductList({
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
-  const isAdmin = currentUser?.role === 'Admin';
+  const isAdmin = currentUser?.role === 'admin';
 
-  const categories = ['All', 'Fashion', 'Home & Living', 'Electronics', 'Groceries'];
+  const categories = [
+    'All',
+    ...new Set(products.map((product) => product.category).filter(Boolean).sort()),
+  ];
 
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {

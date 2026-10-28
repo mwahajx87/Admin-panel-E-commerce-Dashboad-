@@ -1,1 +1,16 @@
 @import "tailwindcss";
+
+.admin-theme {
+  --color-indigo-50: #f2f0f0;
+  --color-indigo-100: #e5e5e5;
+  --color-indigo-200: #d4d4d4;
+  --color-indigo-400: #737373;
+  --color-indigo-500: #111111;
+  --color-indigo-600: #111111;
+  --color-indigo-700: #333333;
+  --color-indigo-800: #262626;
+  --color-indigo-900: #171717;
+  --radius-xl: 18px;
+  --radius-2xl: 20px;
+  font-family: Arial, Helvetica, sans-serif;
+}

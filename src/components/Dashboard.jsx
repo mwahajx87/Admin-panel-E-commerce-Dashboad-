@@ -27,63 +27,65 @@ import {
   Cell,
   Legend
 } from 'recharts';
-import { MONTHLY_SALES_DATA, CATEGORY_BREAKDOWN_DATA } from '../data/mockData';
-
 export default function Dashboard({
   orders,
   products,
   users,
+  metrics,
   currentUser,
   onNavigate,
   onOpenCreateOrder,
   onOpenAddProduct,
   onViewOrder
 }) {
-  // Compute dynamic stats
   const totalRevenue = orders.reduce((acc, order) => {
     return order.status !== 'Cancelled' ? acc + (order.total || 0) : acc;
-  }, 1850000); // base + recent orders in PKR
+  }, 0);
+  const revenue = metrics?.revenue ?? totalRevenue;
+  const monthlySalesData = metrics?.monthlySales ?? [];
+  const categoryBreakdown = metrics?.categoryBreakdown ?? [];
 
-  const totalOrdersCount = orders.length;
-  const totalProductsCount = products.length;
-  const activeUsersCount = users.filter((u) => u.status === 'Active').length;
+  const totalOrdersCount = metrics?.orders ?? orders.length;
+  const totalProductsCount = metrics?.products ?? products.length;
+  const activeUsersCount =
+    metrics?.activeUsers ?? users.filter((u) => u.status === 'Active').length;
 
   const kpis = [
     {
       id: 'kpi-revenue',
       title: 'Total Revenue',
-      value: `Rs. ${totalRevenue.toLocaleString()}`,
-      change: '+14.8%',
-      isPositive: true,
+      value: `Rs. ${revenue.toLocaleString()}`,
+      change: 'All-time',
+      isNeutral: true,
       icon: DollarSign,
-      iconBoxClass: 'bg-indigo-50 text-indigo-600'
+      iconBoxClass: 'bg-[#f2f0f0] text-slate-900'
     },
     {
       id: 'kpi-orders',
       title: 'Total Orders',
       value: totalOrdersCount.toLocaleString(),
-      change: '+4.2%',
-      isPositive: true,
+      change: 'All statuses',
+      isNeutral: true,
       icon: ShoppingCart,
-      iconBoxClass: 'bg-sky-50 text-sky-600'
+      iconBoxClass: 'bg-[#f2f0f0] text-slate-900'
     },
     {
       id: 'kpi-users',
-      title: 'Active Users',
+      title: 'Active Customers',
       value: activeUsersCount.toLocaleString(),
-      change: 'Active Now',
+      change: 'Active customers',
       isNeutral: true,
       icon: Users,
-      iconBoxClass: 'bg-purple-50 text-purple-600'
+      iconBoxClass: 'bg-[#f2f0f0] text-slate-900'
     },
     {
       id: 'kpi-products',
       title: 'Total Products',
       value: `${totalProductsCount} Items`,
-      change: '-2.1%',
-      isPositive: false,
+      change: 'In catalog',
+      isNeutral: true,
       icon: Package,
-      iconBoxClass: 'bg-orange-50 text-orange-600'
+      iconBoxClass: 'bg-[#f2f0f0] text-slate-900'
     }
   ];
 
@@ -128,7 +130,7 @@ export default function Dashboard({
   return (
     <div className="space-y-6">
       {/* Top Banner / Welcome with Quick Actions */}
-      <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
             <h2 className="text-xl font-bold text-slate-800 tracking-tight">
@@ -136,16 +138,16 @@ export default function Dashboard({
             </h2>
             {/* <span
               className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
-                currentUser?.role === 'Admin'
+                currentUser?.role === 'admin'
                   ? 'bg-emerald-100 text-emerald-700'
                   : 'bg-indigo-100 text-indigo-700'
               }`}
             >
-              {currentUser?.role === 'Admin' ? 'Admin Access' : 'View-Only User'}
+              {currentUser?.role === 'admin' ? 'Admin Access' : 'View-Only User'}
             </span> */}
           </div>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            {currentUser?.role === 'Admin'
+            {currentUser?.role === 'admin'
               ? 'Complete administrative permissions enabled to add products, dispatch orders, and manage users.'
               : 'Viewing in read-only mode. Creation, editing, and deletion operations are restricted.'}
           </p>
@@ -156,9 +158,9 @@ export default function Dashboard({
           <button
             id="dashboard-quick-add-order-btn"
             onClick={onOpenCreateOrder}
-            disabled={currentUser?.role !== 'Admin'}
+            disabled={currentUser?.role !== 'admin'}
             className="inline-flex items-center gap-2 px-3 py-2 bg-indigo-600 text-white rounded-lg text-xs font-semibold shadow-sm hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
-            title={currentUser?.role !== 'Admin' ? 'Admin role required to create orders' : 'Create new order'}
+            title={currentUser?.role !== 'admin' ? 'Admin role required to create orders' : 'Create new order'}
           >
             <PlusCircle className="w-4 h-4" />
             <span>Create Order</span>
@@ -167,9 +169,9 @@ export default function Dashboard({
           <button
             id="dashboard-quick-add-prod-btn"
             onClick={onOpenAddProduct}
-            disabled={currentUser?.role !== 'Admin'}
+            disabled={currentUser?.role !== 'admin'}
             className="inline-flex items-center gap-2 px-3 py-2 border border-slate-200 text-slate-700 rounded-lg text-xs font-semibold hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
-            title={currentUser?.role !== 'Admin' ? 'Admin role required to add products' : 'Add new product'}
+            title={currentUser?.role !== 'admin' ? 'Admin role required to add products' : 'Add new product'}
           >
             <Package className="w-4 h-4 text-slate-500" />
             <span>Add Product</span>
@@ -178,14 +180,14 @@ export default function Dashboard({
       </div>
 
       {/* KPI Cards Grid - Geometric Balance */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {kpis.map((kpi) => {
           const Icon = kpi.icon;
           return (
             <div
               key={kpi.id}
               id={kpi.id}
-              className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm"
+              className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm"
             >
               <div className="flex justify-between items-start mb-2">
                 <div className={`p-2 rounded-lg ${kpi.iconBoxClass}`}>
@@ -218,7 +220,7 @@ export default function Dashboard({
       {/* Charts Section: Revenue Analytics & Category Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Revenue Analytics (Line/Area Chart) - 2 cols */}
-        <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-6 flex flex-col shadow-sm">
+        <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6 flex flex-col shadow-sm">
           <div className="flex justify-between items-center mb-6">
             <div>
               <h3 className="font-bold text-slate-800 text-base">Revenue Growth</h3>
@@ -226,19 +228,15 @@ export default function Dashboard({
                 Monthly sales performance and trend trajectory
               </p>
             </div>
-            <select className="text-xs border border-slate-200 rounded-md bg-slate-50 text-slate-600 px-2.5 py-1 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer">
-              <option>Last 6 Months</option>
-              <option>This Year</option>
-            </select>
           </div>
 
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={MONTHLY_SALES_DATA} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+              <AreaChart data={monthlySalesData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
                 <defs>
                   <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#4F46E5" stopOpacity={0.2} />
-                    <stop offset="95%" stopColor="#4F46E5" stopOpacity={0.0} />
+                    <stop offset="5%" stopColor="#111111" stopOpacity={0.16} />
+                    <stop offset="95%" stopColor="#111111" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
@@ -259,12 +257,12 @@ export default function Dashboard({
                     fontSize: '12px',
                     boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                   }}
-                  itemStyle={{ color: '#818CF8' }}
+                  itemStyle={{ color: '#d4d4d4' }}
                 />
                 <Area
                   type="monotone"
                   dataKey="revenue"
-                  stroke="#4F46E5"
+                  stroke="#111111"
                   strokeWidth={2.5}
                   fillOpacity={1}
                   fill="url(#revenueGradient)"
@@ -275,14 +273,14 @@ export default function Dashboard({
         </div>
 
         {/* Category Breakdown (Pie / Donut Chart) - 1 col */}
-        <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm flex flex-col">
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col">
           <h3 className="font-bold text-slate-800 text-base mb-4">Category Breakdown</h3>
 
           <div className="h-44 w-full flex items-center justify-center relative">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  data={CATEGORY_BREAKDOWN_DATA}
+                  data={categoryBreakdown}
                   cx="50%"
                   cy="50%"
                   innerRadius={50}
@@ -290,7 +288,7 @@ export default function Dashboard({
                   paddingAngle={3}
                   dataKey="value"
                 >
-                  {CATEGORY_BREAKDOWN_DATA.map((entry, index) => (
+                  {categoryBreakdown.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
@@ -308,14 +306,20 @@ export default function Dashboard({
             </ResponsiveContainer>
             {/* Center stat */}
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span className="text-[10px] text-slate-400 uppercase font-medium">Total</span>
-              <span className="text-sm font-bold text-slate-800">100%</span>
+              {categoryBreakdown.length > 0 ? (
+                <>
+                  <span className="text-[10px] text-slate-400 uppercase font-medium">Total</span>
+                  <span className="text-sm font-bold text-slate-800">100%</span>
+                </>
+              ) : (
+                <span className="text-[10px] text-slate-400">No sales yet</span>
+              )}
             </div>
           </div>
 
           {/* Geometric legend list matching the design */}
           <div className="mt-4 space-y-2 pt-3 border-t border-slate-100">
-            {CATEGORY_BREAKDOWN_DATA.map((cat) => (
+            {categoryBreakdown.map((cat) => (
               <div key={cat.name} className="flex items-center justify-between text-xs text-slate-600">
                 <div className="flex items-center gap-2">
                   <div
@@ -332,7 +336,7 @@ export default function Dashboard({
       </div>
 
       {/* Recent Orders Table */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
           <h3 className="font-bold text-slate-800 text-base">Recent Orders</h3>
           <button

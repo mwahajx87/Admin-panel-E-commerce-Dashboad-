@@ -5,6 +5,9 @@ export default function AddProductModal({ isOpen, onClose, onSave, editingProduc
   const [name, setName] = useState('');
   const [sku, setSku] = useState('');
   const [category, setCategory] = useState('Fashion');
+  const [styles, setStyles] = useState('');
+  const [colors, setColors] = useState('');
+  const [sizes, setSizes] = useState('');
   const [price, setPrice] = useState('');
   const [stock, setStock] = useState('');
   const [image, setImage] = useState('');
@@ -18,6 +21,9 @@ export default function AddProductModal({ isOpen, onClose, onSave, editingProduc
       setName(editingProduct.name || '');
       setSku(editingProduct.sku || '');
       setCategory(editingProduct.category || 'Fashion');
+      setStyles((editingProduct.styles || []).join(', '));
+      setColors((editingProduct.colors || []).join(', '));
+      setSizes((editingProduct.sizes || []).join(', '));
       setPrice(editingProduct.price ? String(editingProduct.price) : '');
       setStock(editingProduct.stock !== undefined ? String(editingProduct.stock) : '');
       setImage(editingProduct.image || '');
@@ -28,6 +34,9 @@ export default function AddProductModal({ isOpen, onClose, onSave, editingProduc
       setName('');
       setSku(`PK-${Math.floor(1000 + Math.random() * 9000)}`);
       setCategory('Fashion');
+      setStyles('');
+      setColors('');
+      setSizes('');
       setPrice('');
       setStock('');
       setImage('https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=150&auto=format&fit=crop&q=80');
@@ -64,6 +73,9 @@ export default function AddProductModal({ isOpen, onClose, onSave, editingProduc
       name: name.trim(),
       sku: sku.trim() || `SKU-${Date.now().toString().slice(-4)}`,
       category,
+      styles: styles.split(',').map((style) => style.trim().toLowerCase()).filter(Boolean),
+      colors: colors.split(',').map((color) => color.trim()).filter(Boolean),
+      sizes: sizes.split(',').map((size) => size.trim()).filter(Boolean),
       price: numPrice,
       stock: numStock,
       stockStatus,
@@ -159,6 +171,46 @@ export default function AddProductModal({ isOpen, onClose, onSave, editingProduc
                 className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:bg-white transition-colors"
               />
             </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1" htmlFor="product-styles-input">
+              Store styles
+            </label>
+            <input
+              id="product-styles-input"
+              type="text"
+              value={styles}
+              onChange={(event) => setStyles(event.target.value)}
+              placeholder="casual, formal, party, gym"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:bg-white transition-colors"
+            />
+            <p className="mt-1 text-[10px] text-slate-500">Separate style tags with commas.</p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <label className="block text-xs font-semibold text-slate-700" htmlFor="product-colors-input">
+              Available colors
+              <input
+                id="product-colors-input"
+                type="text"
+                value={colors}
+                onChange={(event) => setColors(event.target.value)}
+                placeholder="Black, Navy, Brown"
+                className="mt-1 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-normal text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              />
+            </label>
+            <label className="block text-xs font-semibold text-slate-700" htmlFor="product-sizes-input">
+              Available sizes
+              <input
+                id="product-sizes-input"
+                type="text"
+                value={sizes}
+                onChange={(event) => setSizes(event.target.value)}
+                placeholder="Small, Medium, Large"
+                className="mt-1 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-normal text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              />
+            </label>
           </div>
 
           {/* Price & Stock */}

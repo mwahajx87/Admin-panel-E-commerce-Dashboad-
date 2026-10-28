@@ -6,6 +6,7 @@ export const INITIAL_PRODUCTS = [
     name: "Khaadi Embroidered 3-Piece Lawn Suit",
     sku: "KHD-LWN-101",
     category: "Fashion",
+    styles: ["casual", "formal", "party"],
     price: 6850,
     stock: 45,
     stockStatus: "in_stock",
@@ -17,6 +18,7 @@ export const INITIAL_PRODUCTS = [
     name: "Handcrafted Charsadda Norozi Peshawari Chappal",
     sku: "PSH-NOR-202",
     category: "Fashion",
+    styles: ["casual"],
     price: 4950,
     stock: 28,
     stockStatus: "in_stock",
@@ -39,6 +41,7 @@ export const INITIAL_PRODUCTS = [
     name: "Audionic Airbud 400 Pro ANC Earbuds",
     sku: "AUD-AIR-400",
     category: "Electronics",
+    styles: ["gym"],
     price: 7499,
     stock: 35,
     stockStatus: "in_stock",
@@ -83,6 +86,7 @@ export const INITIAL_PRODUCTS = [
     name: "Karachi Buffed Leather Bifold Wallet & Belt Set",
     sku: "KHI-LTH-77",
     category: "Fashion",
+    styles: ["casual", "formal"],
     price: 3850,
     stock: 22,
     stockStatus: "in_stock",
@@ -296,23 +300,4 @@ export const INITIAL_USERS = [
     status: "Active",
     avatar: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=100&auto=format&fit=crop&q=80"
   }
-];
-
-export const MONTHLY_SALES_DATA = [
-  { month: "Jan", revenue: 450000, orders: 110 },
-  { month: "Feb", revenue: 580000, orders: 135 },
-  { month: "Mar", revenue: 720000, orders: 165 },
-  { month: "Apr", revenue: 690000, orders: 150 },
-  { month: "May", revenue: 880000, orders: 195 },
-  { month: "Jun", revenue: 950000, orders: 215 },
-  { month: "Jul", revenue: 910000, orders: 205 },
-  { month: "Aug", revenue: 1140000, orders: 250 },
-  { month: "Sep", revenue: 1285000, orders: 280 }
-];
-
-export const CATEGORY_BREAKDOWN_DATA = [
-  { name: "Fashion", value: 36, color: "#4F46E5" },
-  { name: "Home & Living", value: 24, color: "#0EA5E9" },
-  { name: "Electronics", value: 20, color: "#10B981" },
-  { name: "Groceries", value: 20, color: "#F59E0B" }
 ];

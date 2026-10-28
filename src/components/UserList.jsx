@@ -25,7 +25,7 @@ export default function UserList({
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
-  const isAdmin = currentUser?.role === 'Admin';
+  const isAdmin = currentUser?.role === 'admin';
 
   const filteredUsers = useMemo(() => {
     return users.filter((u) => {
@@ -103,8 +103,8 @@ export default function UserList({
               className="px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
             >
               <option value="All">All Roles</option>
-              <option value="Admin">Admin</option>
-              <option value="Customer">Customer</option>
+              <option value="admin">Admin</option>
+              <option value="customer">Customer</option>
             </select>
           </div>
 
@@ -178,7 +178,7 @@ export default function UserList({
 
                     {/* Role Badge */}
                     <td className="px-6 py-3.5">
-                      {user.role === 'Admin' ? (
+                      {user.role === 'admin' ? (
                         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-indigo-100 text-indigo-700">
                           Admin
                         </span>

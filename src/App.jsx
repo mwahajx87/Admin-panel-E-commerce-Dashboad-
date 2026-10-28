@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import LoginPage from "./components/LoginPage";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
@@ -12,193 +13,262 @@ import UserList from "./components/UserList";
 import EditUserModal from "./components/EditUserModal";
 import ConfirmDeleteModal from "./components/ConfirmDeleteModal";
 import {
-  INITIAL_PRODUCTS,
-  INITIAL_ORDERS,
-  INITIAL_USERS,
-} from "./data/mockData";
+  createOrder,
+  deleteOrder,
+  deleteProduct,
+  deleteUser,
+  getCurrentUser,
+  isBackendConfigured,
+  loadAdminData,
+  login,
+  logout,
+  saveProduct,
+  saveUser,
+  updateOrderStatus,
+} from "./services/adminApi";
 import { CheckCircle2 } from "lucide-react";
 
-export default function App() {
-  const [currentUser, setCurrentUser] = useState({
-    email: "wahajwahaj200@gmail.com",
-    name: "Muhammad Wahaj",
-    role: "Admin",
-    avatar:
-      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80",
-  });
+const tabPaths = {
+  dashboard: "/dashboard",
+  orders: "/orders",
+  products: "/products",
+  users: "/users",
+};
 
-  // Navigation state
-  const [activeTab, setActiveTab] = useState("dashboard"); // 'dashboard' | 'orders' | 'products' | 'users'
+const pathTabs = Object.fromEntries(
+  Object.entries(tabPaths).map(([tab, path]) => [path, tab]),
+);
+
+export default function App() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [currentUser, setCurrentUser] = useState(null);
+  const [isInitializing, setIsInitializing] = useState(true);
+  const [isDataLoading, setIsDataLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("dashboard");
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [globalSearch, setGlobalSearch] = useState("");
-
-  // Core Data State (shared across all modules)
-  const [products, setProducts] = useState(INITIAL_PRODUCTS);
-  const [orders, setOrders] = useState(INITIAL_ORDERS);
-  const [users, setUsers] = useState(INITIAL_USERS);
-
-  // Modals state
+  const [products, setProducts] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [dashboardMetrics, setDashboardMetrics] = useState(null);
   const [isCreateOrderOpen, setIsCreateOrderOpen] = useState(false);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [viewingOrder, setViewingOrder] = useState(null);
   const [editingUser, setEditingUser] = useState(null);
-
-  // Workable Delete Target Modal State
   const [deleteTarget, setDeleteTarget] = useState(null);
-
-  // Toast feedback message state
   const [toastMessage, setToastMessage] = useState(null);
+  const [appError, setAppError] = useState("");
 
-  const showToast = (msg) => {
-    setToastMessage(msg);
-    setTimeout(() => {
-      setToastMessage(null);
-    }, 3500);
-  };
-
-  // Auth actions
-  const handleLogin = (userObj) => {
-    setCurrentUser(userObj);
-    setActiveTab("dashboard");
-    showToast(`Welcome back, ${userObj.name}! Logged in as ${userObj.role}.`);
-  };
-
-  const handleLogout = () => {
-    setCurrentUser(null);
-    setActiveTab("dashboard");
-  };
-
-  // Order Handlers
-  const handleCreateOrder = (newOrder) => {
-    setOrders((prev) => [newOrder, ...prev]);
-
-    // Automatically decrement product inventory
-    setProducts((prev) =>
-      prev.map((prod) => {
-        const lineItem = newOrder.items.find(
-          (item) => item.productId === prod.id,
-        );
-        if (lineItem) {
-          const newStock = Math.max(0, prod.stock - lineItem.quantity);
-          let newStatus = "in_stock";
-          if (newStock === 0) newStatus = "out_of_stock";
-          else if (newStock <= 10) newStatus = "low_stock";
-          return {
-            ...prod,
-            stock: newStock,
-            stockStatus: newStatus,
-          };
-        }
-        return prod;
-      }),
-    );
-
-    showToast(`Order ${newOrder.id} successfully created and dispatched!`);
-  };
-
-  const handleUpdateOrderStatus = (orderId, newStatus) => {
-    setOrders((prev) =>
-      prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o)),
-    );
-    if (viewingOrder && viewingOrder.id === orderId) {
-      setViewingOrder((prev) => (prev ? { ...prev, status: newStatus } : null));
+  useEffect(() => {
+    if (isInitializing) return;
+    if (!currentUser) {
+      if (location.pathname !== "/login") {
+        navigate("/login", { replace: true });
+      }
+      return;
     }
-    showToast(`Order status updated to "${newStatus}"`);
-  };
 
-  // Product Handlers
-  const handleSaveProduct = (productData) => {
-    if (editingProduct) {
-      setProducts((prev) =>
-        prev.map((p) => (p.id === productData.id ? productData : p)),
-      );
-      showToast(`Product "${productData.name}" updated successfully.`);
+    if (location.pathname === "/" || location.pathname === "/login") {
+      navigate("/dashboard", { replace: true });
+      return;
+    }
+
+    const routeTab = pathTabs[location.pathname];
+    if (routeTab) {
+      setActiveTab(routeTab);
     } else {
-      setProducts((prev) => [productData, ...prev]);
-      showToast(`New product "${productData.name}" added to catalog.`);
+      navigate("/dashboard", { replace: true });
     }
-    setEditingProduct(null);
+  }, [currentUser, isInitializing, location.pathname, navigate]);
+
+  const refreshData = useCallback(async () => {
+    setIsDataLoading(true);
+    try {
+      const data = await loadAdminData();
+      setProducts(data.products);
+      setOrders(data.orders);
+      setUsers(data.users);
+      setDashboardMetrics(data.dashboardMetrics);
+      setAppError("");
+    } finally {
+      setIsDataLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const initialize = async () => {
+      try {
+        const user = await getCurrentUser();
+        if (!isMounted) return;
+        if (user) {
+          const data = await loadAdminData();
+          if (!isMounted) return;
+          setCurrentUser(user);
+          setProducts(data.products);
+          setOrders(data.orders);
+          setUsers(data.users);
+          setDashboardMetrics(data.dashboardMetrics);
+        }
+      } catch (error) {
+        if (isMounted) setAppError(error.message);
+      } finally {
+        if (isMounted) setIsInitializing(false);
+      }
+    };
+
+    initialize();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const showToast = (message) => {
+    setToastMessage(message);
+    window.setTimeout(() => setToastMessage(null), 3500);
   };
 
-  // User Handlers
-  const handleSaveUser = (updatedUser) => {
-    setUsers((prev) =>
-      prev.map((u) => (u.id === updatedUser.id ? updatedUser : u)),
+  const handleLogin = async (credentials) => {
+    const user = await login(credentials);
+    const data = await loadAdminData();
+    setCurrentUser(user);
+    setProducts(data.products);
+    setOrders(data.orders);
+    setUsers(data.users);
+    setDashboardMetrics(data.dashboardMetrics);
+    setAppError("");
+    setActiveTab("dashboard");
+    navigate("/dashboard", { replace: true });
+    showToast(`Welcome back, ${user.name}! Logged in as ${user.role}.`);
+  };
+
+  const navigateToTab = (tab) => {
+    setActiveTab(tab);
+    navigate(tabPaths[tab]);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      setAppError(error.message);
+    } finally {
+      setCurrentUser(null);
+      setActiveTab("dashboard");
+    }
+  };
+
+  const runMutation = async (operation, successMessage) => {
+    setAppError("");
+    try {
+      await operation();
+      await refreshData();
+      showToast(successMessage);
+    } catch (error) {
+      setAppError(error.message);
+    }
+  };
+
+  const handleCreateOrder = (order) =>
+    runMutation(
+      () => createOrder(order),
+      `Order ${order.id} successfully created.`,
     );
-    showToast(`User account "${updatedUser.name}" updated.`);
-    setEditingUser(null);
-  };
 
-  // Workable Delete Requests
-  const handleRequestDeleteProduct = (product) => {
-    const prod =
-      typeof product === "object"
-        ? product
-        : products.find((p) => p.id === product);
-    if (!prod) return;
-    setDeleteTarget({
-      type: "product",
-      id: prod.id,
-      name: prod.name,
-      itemType: "product",
-      title: "Delete Product",
-    });
-  };
+  const handleUpdateOrderStatus = (orderId, status) =>
+    runMutation(
+      async () => {
+        await updateOrderStatus(orderId, status);
+        if (viewingOrder?.id === orderId) {
+          setViewingOrder((order) => (order ? { ...order, status } : null));
+        }
+      },
+      `Order status updated to "${status}".`,
+    );
 
-  const handleRequestDeleteOrder = (order) => {
-    const ord =
-      typeof order === "object" ? order : orders.find((o) => o.id === order);
-    if (!ord) return;
-    setDeleteTarget({
-      type: "order",
-      id: ord.id,
-      name: `Order #${ord.id} (${ord.customerName})`,
-      itemType: "order",
-      title: "Delete Order Record",
-    });
-  };
+  const handleSaveProduct = (product) =>
+    runMutation(
+      () => saveProduct(product, Boolean(editingProduct)),
+      editingProduct
+        ? `Product "${product.name}" updated successfully.`
+        : `New product "${product.name}" added to catalog.`,
+    ).then(() => setEditingProduct(null));
 
-  const handleRequestDeleteUser = (user) => {
-    const usr =
-      typeof user === "object" ? user : users.find((u) => u.id === user);
-    if (!usr) return;
-    setDeleteTarget({
-      type: "user",
-      id: usr.id,
-      name: `${usr.name} (${usr.email})`,
-      itemType: "user account",
-      title: "Delete User Account",
-    });
+  const handleSaveUser = (user) =>
+    runMutation(
+      () => saveUser(user),
+      `User account "${user.name}" updated.`,
+    ).then(() => setEditingUser(null));
+
+  const requestDelete = (type, item) => {
+    const configurations = {
+      product: {
+        name: item.name,
+        itemType: "product",
+        title: "Delete Product",
+      },
+      order: {
+        name: `Order #${item.id} (${item.customerName})`,
+        itemType: "order",
+        title: "Delete Order Record",
+      },
+      user: {
+        name: `${item.name} (${item.email})`,
+        itemType: "user account",
+        title: "Delete User Account",
+      },
+    };
+    setDeleteTarget({ type, id: item.id, ...configurations[type] });
   };
 
   const handleConfirmDelete = () => {
     if (!deleteTarget) return;
+
     const { type, id, name } = deleteTarget;
+    const deleteActions = {
+      product: deleteProduct,
+      order: deleteOrder,
+      user: deleteUser,
+    };
+    const itemLabels = {
+      product: `Product "${name}" permanently removed.`,
+      order: `${name} permanently removed.`,
+      user: `User account "${name}" permanently removed.`,
+    };
 
-    if (type === "product") {
-      setProducts((prev) => prev.filter((p) => p.id !== id));
-      showToast(`Product "${name}" permanently removed.`);
-    } else if (type === "order") {
-      setOrders((prev) => prev.filter((o) => o.id !== id));
-      showToast(`${name} permanently removed.`);
-    } else if (type === "user") {
-      setUsers((prev) => prev.filter((u) => u.id !== id));
-      showToast(`User account "${name}" permanently removed.`);
-    }
-
-    setDeleteTarget(null);
+    runMutation(() => deleteActions[type](id), itemLabels[type]).then(() =>
+      setDeleteTarget(null),
+    );
   };
 
-  // If user is not authenticated, show LoginPage
+  if (isInitializing) {
+    return (
+      <div className="admin-theme min-h-screen flex items-center justify-center bg-[#f7f7f7] text-sm text-slate-500">
+        Connecting to the admin panel...
+      </div>
+    );
+  }
+
   if (!currentUser) {
-    return <LoginPage onLogin={handleLogin} />;
+    return (
+      <LoginPage
+        onLogin={handleLogin}
+        isBackendConfigured={isBackendConfigured}
+        initialError={appError}
+      />
+    );
+  }
+
+  if (location.pathname === "/login") {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex text-slate-900 font-sans antialiased selection:bg-indigo-500 selection:text-white">
-      {/* Toast notification banner */}
+    <div className="admin-theme min-h-screen bg-[#f7f7f7] flex text-slate-900 font-sans antialiased selection:bg-black selection:text-white">
       {toastMessage && (
         <div className="fixed bottom-5 right-5 z-50 flex items-center gap-2 bg-slate-900 text-white text-xs font-semibold px-4 py-3 rounded-2xl shadow-xl border border-slate-700 animate-in slide-in-from-bottom-5 duration-200">
           <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -206,10 +276,9 @@ export default function App() {
         </div>
       )}
 
-      {/* Collapsible / Responsive Sidebar */}
       <Sidebar
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={navigateToTab}
         currentUser={currentUser}
         onLogout={handleLogout}
         counts={{
@@ -223,9 +292,7 @@ export default function App() {
         setMobileOpen={setIsMobileMenuOpen}
       />
 
-      {/* Main Layout Container */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Top Header */}
         <Header
           currentUser={currentUser}
           onLogout={handleLogout}
@@ -235,21 +302,38 @@ export default function App() {
           setGlobalSearch={setGlobalSearch}
         />
 
-        {/* Dynamic Page Content */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+          {appError && (
+            <div
+              role="alert"
+              className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+            >
+              <span>{appError}</span>
+              <button
+                type="button"
+                onClick={refreshData}
+                disabled={isDataLoading}
+                className="font-semibold underline disabled:opacity-50"
+              >
+                {isDataLoading ? "Retrying..." : "Retry"}
+              </button>
+            </div>
+          )}
+
           {activeTab === "dashboard" && (
             <Dashboard
               orders={orders}
               products={products}
               users={users}
+              metrics={dashboardMetrics}
               currentUser={currentUser}
-              onNavigate={setActiveTab}
+              onNavigate={navigateToTab}
               onOpenCreateOrder={() => setIsCreateOrderOpen(true)}
               onOpenAddProduct={() => {
                 setEditingProduct(null);
                 setIsProductModalOpen(true);
               }}
-              onViewOrder={(order) => setViewingOrder(order)}
+              onViewOrder={setViewingOrder}
             />
           )}
 
@@ -265,7 +349,7 @@ export default function App() {
                 setEditingProduct(product);
                 setIsProductModalOpen(true);
               }}
-              onDeleteProduct={handleRequestDeleteProduct}
+              onDeleteProduct={(product) => requestDelete("product", product)}
             />
           )}
 
@@ -274,9 +358,9 @@ export default function App() {
               orders={orders}
               currentUser={currentUser}
               onOpenCreateOrder={() => setIsCreateOrderOpen(true)}
-              onViewOrder={(order) => setViewingOrder(order)}
+              onViewOrder={setViewingOrder}
               onUpdateStatus={handleUpdateOrderStatus}
-              onDeleteOrder={handleRequestDeleteOrder}
+              onDeleteOrder={(order) => requestDelete("order", order)}
             />
           )}
 
@@ -284,22 +368,19 @@ export default function App() {
             <UserList
               users={users}
               currentUser={currentUser}
-              onEditUser={(user) => setEditingUser(user)}
-              onDeleteUser={handleRequestDeleteUser}
+              onEditUser={setEditingUser}
+              onDeleteUser={(user) => requestDelete("user", user)}
             />
           )}
         </main>
       </div>
 
-      {/* Modal: Create Order */}
       <CreateOrderModal
         isOpen={isCreateOrderOpen}
         onClose={() => setIsCreateOrderOpen(false)}
         products={products}
         onSubmitOrder={handleCreateOrder}
       />
-
-      {/* Modal: Add or Edit Product */}
       <AddProductModal
         isOpen={isProductModalOpen}
         onClose={() => {
@@ -309,25 +390,19 @@ export default function App() {
         onSave={handleSaveProduct}
         editingProduct={editingProduct}
       />
-
-      {/* Modal: View Order Details */}
       <OrderDetailsModal
         isOpen={!!viewingOrder}
         onClose={() => setViewingOrder(null)}
         order={viewingOrder}
         onUpdateStatus={handleUpdateOrderStatus}
-        isAdmin={currentUser.role === "Admin"}
+        isAdmin={currentUser.role === "admin"}
       />
-
-      {/* Modal: Edit User Role & Status */}
       <EditUserModal
         isOpen={!!editingUser}
         onClose={() => setEditingUser(null)}
         user={editingUser}
         onSaveUser={handleSaveUser}
       />
-
-      {/* Modal: Workable Confirmation for Deletions */}
       <ConfirmDeleteModal
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}

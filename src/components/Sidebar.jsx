@@ -70,29 +70,34 @@ export default function Sidebar({
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed h-screen top-0 bottom-0 left-0 z-50 flex flex-col bg-slate-900 border-r border-slate-800 transition-all duration-300 ease-in-out lg:static ${
+        className={`fixed h-screen top-0 bottom-0 left-0 z-50 flex flex-col bg-white border-r border-slate-200 transition-all duration-300 ease-in-out lg:static ${
           mobileOpen
             ? "translate-x-0 w-72"
             : "-translate-x-full lg:translate-x-0"
         } ${isCollapsed ? "lg:w-20" : "lg:w-64"}`}
       >
         {/* Brand Header */}
-        <div className="flex items-center justify-between h-16 px-5 border-b border-slate-800">
+        <div className="flex items-center justify-between h-16 px-5 border-b border-slate-200">
           {!isCollapsed && (
             <div className="truncate flex items-center gap-3 overflow-hidden">
-              <div className="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center text-white font-bold italic shadow-sm shrink-0">
-                A
+              <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center text-white shrink-0">
+                <Store className="w-4 h-4" />
               </div>
-              <span className="text-lg font-bold tracking-tight text-white">
-                Admin
-              </span>
+              <div className="min-w-0">
+                <span className="block text-base font-black tracking-tight text-slate-900">
+                  SHOP.CO
+                </span>
+                <span className="block text-[9px] font-semibold tracking-[0.18em] text-slate-500">
+                  ADMIN
+                </span>
+              </div>
             </div>
           )}
 
           {/* Mobile close button */}
           <button
             onClick={() => setMobileOpen(false)}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 lg:hidden"
+            className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 lg:hidden"
           >
             <X className="w-5 h-5" />
           </button>
@@ -100,7 +105,7 @@ export default function Sidebar({
           {/* Desktop collapse toggle */}
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="hidden lg:flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="hidden lg:flex items-center justify-center w-8 h-8 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
             title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
           >
             {isCollapsed ? (
@@ -122,7 +127,7 @@ export default function Sidebar({
                   <User className="w-4 h-4 text-emerald-400" />
                 )}
                 <span className="text-xs font-semibold text-slate-200">
-                  {currentUser?.role === "Admin"
+                  {currentUser?.role === "admin"
                     ? "Admin Mode"
                     : "View-Only Mode"}
                 </span>
@@ -158,8 +163,8 @@ export default function Sidebar({
                 onClick={() => handleNavClick(item.id)}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
                   isActive
-                    ? "bg-indigo-600 text-white shadow-sm"
-                    : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                    ? "bg-black text-white shadow-sm"
+                    : "text-slate-600 hover:bg-[#f2f0f0] hover:text-slate-900"
                 } ${isCollapsed ? "justify-center" : "justify-between"}`}
                 title={isCollapsed ? item.label : undefined}
               >
@@ -174,8 +179,8 @@ export default function Sidebar({
                   <span
                     className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${
                       isActive
-                        ? "bg-indigo-700/80 text-white"
-                        : "bg-slate-800 text-slate-400"
+                        ? "bg-white/15 text-white"
+                        : "bg-slate-100 text-slate-500"
                     }`}
                   >
                     {item.badge}
@@ -187,13 +192,13 @@ export default function Sidebar({
         </nav>
 
         {/* Bottom Section: Current User & Logout */}
-        <div className="p-4 border-t border-slate-800 space-y-3">
+        <div className="p-4 border-t border-slate-200 space-y-3">
           <div
-            className={`flex items-center gap-3 p-2.5 bg-slate-800 rounded-lg ${
+            className={`flex items-center gap-3 p-2.5 bg-[#f2f0f0] rounded-xl ${
               isCollapsed ? "justify-center" : ""
             }`}
           >
-            <div className="w-8 h-8 rounded-full bg-indigo-500/80 flex items-center justify-center text-white text-xs font-bold flex-shrink-0 overflow-hidden">
+            <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center text-white text-xs font-bold flex-shrink-0 overflow-hidden">
               {currentUser?.avatar ? (
                 <img
                   src={currentUser.avatar}
@@ -207,10 +212,10 @@ export default function Sidebar({
             </div>
             {!isCollapsed && (
               <div className="min-w-0 flex-1 overflow-hidden">
-                <div className="text-xs font-semibold text-white truncate">
+                <div className="text-xs font-semibold text-slate-900 truncate">
                   {currentUser?.name}
                 </div>
-                <div className="text-[10px] text-slate-400">
+                <div className="text-[10px] text-slate-500">
                   {currentUser?.role === "Admin"
                     ? "Senior Admin"
                     : "Standard User"}
@@ -222,7 +227,7 @@ export default function Sidebar({
           <button
             id="sidebar-logout-btn"
             onClick={onLogout}
-            className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer ${
+            className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer ${
               isCollapsed ? "justify-center" : ""
             }`}
             title="Log out"

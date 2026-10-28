@@ -29,15 +29,12 @@ export default function OrderList({
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
-  const isAdmin = currentUser?.role === 'Admin';
+  const isAdmin = currentUser?.role === 'admin';
 
-  const statuses = ['All', 'Pending', 'Shipped', 'Delivered', 'Cancelled'];
+  const statuses = ['All', 'Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
   const paymentMethods = [
     'All',
-    'JazzCash',
-    'EasyPaisa',
-    'Cash on Delivery (COD)',
-    'Raast / Bank Transfer'
+    ...new Set(orders.map((order) => order.paymentMethod).filter(Boolean).sort()),
   ];
 
   const filteredOrders = useMemo(() => {

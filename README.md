@@ -1,16 +1,34 @@
-# React + Vite
+# E-Commerce Admin Panel
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Live admin panel: https://admin-panel-e-commerce-dashboad.vercel.app/.
 
-Currently, two official plugins are available:
+The admin app can be served at `/admin` by the shared Express backend or at
+the root of its own domain. It uses the same MongoDB database as the storefront
+and authenticates administrators through `/api/auth`.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Development
 
-## React Compiler
+From the workspace root, install each app's dependencies, configure
+`backend/.env`, then seed MongoDB:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```powershell
+npm install --prefix backend
+npm install --prefix Admin-panel-E-commerce-Dashboad-
+npm install --prefix E-Commerce-Website--React-js-
+npm --prefix backend run seed
+npm run dev
+```
 
-## Expanding the ESLint configuration
+The admin Vite server runs on port 5174 and proxies `/api` to port 5000. The
+workspace root README documents production build and start commands.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+For its standalone Vercel deployment, set `VITE_ADMIN_BASE_PATH=/` and
+`VITE_API_BASE_URL` to the deployed backend's `/api` URL. The standalone
+deployment must be rebuilt after changing these Vercel environment variables.
+
+## Admin API
+
+Administrator CRUD operations use `/api/admin/products`, `/api/admin/orders`,
+`/api/admin/users`, and `/api/admin/dashboard`. All `/api/admin/*` routes
+require an active user with the `admin` role. The storefront reads products
+from `/api/products` and creates orders through `/api/orders`.

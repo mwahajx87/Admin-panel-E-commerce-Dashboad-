@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { X, UserCheck, Shield, Mail, Calendar, User } from 'lucide-react';
 
 export default function EditUserModal({ isOpen, onClose, user, onSaveUser }) {
-  const [role, setRole] = useState('Customer');
+  const [role, setRole] = useState('customer');
   const [status, setStatus] = useState('Active');
 
   useEffect(() => {
     if (user) {
-      setRole(user.role || 'Customer');
+      setRole(user.role || 'customer');
       setStatus(user.status || 'Active');
     }
   }, [user, isOpen]);
@@ -75,8 +75,8 @@ export default function EditUserModal({ isOpen, onClose, user, onSaveUser }) {
               onChange={(e) => setRole(e.target.value)}
               className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
             >
-              <option value="Admin">Admin (Full Administrative Privileges)</option>
-              <option value="Customer">Customer (Standard User - Read Only)</option>
+              <option value="admin">Admin (Full Administrative Privileges)</option>
+              <option value="customer">Customer (Standard User - Read Only)</option>
             </select>
           </div>
 

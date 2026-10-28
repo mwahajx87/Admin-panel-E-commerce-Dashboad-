@@ -88,7 +88,7 @@ export default function Header({
       {/* Center / Search bar with Geometric Balance pill shape */}
       <div className="hidden md:flex items-center flex-1 max-w-sm mx-6">
         <div className="relative w-full">
-          <div className="flex items-center gap-3 bg-slate-100 rounded-full px-4 py-1.5 w-full border border-slate-200 focus-within:border-indigo-400 focus-within:bg-white transition-all">
+          <div className="flex items-center gap-3 bg-[#f2f0f0] rounded-full px-4 py-1.5 w-full border border-transparent focus-within:border-slate-300 focus-within:bg-white transition-all">
             <Search className="w-4 h-4 text-slate-400 shrink-0" />
             <input
               id="header-global-search"
@@ -116,13 +116,13 @@ export default function Header({
         {/* <div
           id="header-role-badge"
           className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-            currentUser?.role === 'Admin'
+            currentUser?.role === 'admin'
               ? 'bg-emerald-100 text-emerald-700 border border-emerald-200'
               : 'bg-indigo-100 text-indigo-700 border border-indigo-200'
           }`}
         >
-          <span className={`w-1.5 h-1.5 rounded-full ${currentUser?.role === 'Admin' ? 'bg-emerald-500' : 'bg-indigo-500'} animate-pulse`}></span>
-          <span>{currentUser?.role === 'Admin' ? 'Admin Access' : 'User Access'}</span>
+          <span className={`w-1.5 h-1.5 rounded-full ${currentUser?.role === 'admin' ? 'bg-emerald-500' : 'bg-indigo-500'} animate-pulse`}></span>
+          <span>{currentUser?.role === 'admin' ? 'Admin Access' : 'User Access'}</span>
         </div> */}
 
         {/* Notifications Dropdown */}
@@ -193,7 +193,7 @@ export default function Header({
                 {currentUser?.name}
               </p>
               <p className="text-[11px] text-slate-500 font-medium">
-                {currentUser?.role === 'Admin' ? 'Administrator' : 'Standard User'}
+                {currentUser?.role === 'admin' ? 'Administrator' : 'Standard User'}
               </p>
             </div>
           </button>
@@ -205,7 +205,7 @@ export default function Header({
                 <p className="text-xs text-slate-500 truncate">{currentUser?.email}</p>
                 <span
                   className={`inline-block text-[10px] font-semibold mt-1 px-2 py-0.5 rounded-full ${
-                    currentUser?.role === 'Admin'
+                    currentUser?.role === 'admin'
                       ? 'bg-indigo-100 text-indigo-700'
                       : 'bg-emerald-100 text-emerald-700'
                   }`}

@@ -9,51 +9,53 @@ import {
   EyeOff,
 } from "lucide-react";
 
-export default function LoginPage({ onLogin }) {
-  const [email, setEmail] = useState("wahajwahaj200@gmail.com");
-  const [password, setPassword] = useState("Admin@Pak2026!");
+export default function LoginPage({
+  onLogin,
+  isBackendConfigured,
+  initialError = "",
+}) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(initialError);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
     setIsLoading(true);
-
-    setTimeout(() => {
-      onLogin({
-        email: email || "wahajwahaj200@gmail.com",
-        name: "Muhammad Wahaj",
-        role: "Admin",
-        avatar:
-          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80",
-      });
+    try {
+      await onLogin({ email, password });
+    } catch (loginError) {
+      setError(loginError.message || "Unable to sign in. Please try again.");
+    } finally {
       setIsLoading(false);
-    }, 400);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4 sm:p-6 lg:p-8">
+    <div className="admin-theme min-h-screen bg-[#f2f0f0] flex items-center justify-center p-4 sm:p-6 lg:p-8">
       <div className="w-full max-w-md">
         {/* Brand Header */}
         <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-900/40 mb-3">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-black text-white mb-3">
             <Store className="w-6 h-6" />
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
-            E-Commerce Admin 
+          <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900">
+            SHOP.CO
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 mt-1">
             E-Commerce Management Platform
           </p>
         </div>
 
         {/* Login Card */}
-        <div className="bg-slate-800/95 border border-slate-700/80 rounded-xl p-6 sm:p-7 shadow-xl">
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 shadow-sm">
           <div className="mb-4">
-            <h2 className="text-sm font-bold text-white">
+            <h2 className="text-sm font-bold text-slate-900">
               Sign In to Dashboard
             </h2>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-500 mt-0.5">
               Enter your administrative credentials
             </p>
           </div>
@@ -62,13 +64,13 @@ export default function LoginPage({ onLogin }) {
             {/* Email Field */}
             <div>
               <label
-                className="block text-xs font-semibold text-slate-300 mb-1"
+                className="block text-xs font-semibold text-slate-700 mb-1"
                 htmlFor="login-email"
               >
                 Email Address
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                   <Mail className="w-4 h-4" />
                 </div>
                 <input
@@ -78,7 +80,7 @@ export default function LoginPage({ onLogin }) {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@store.pk"
-                  className="w-full pl-9 pr-3 py-2 bg-slate-900/90 border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                  className="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                 />
               </div>
             </div>
@@ -86,13 +88,13 @@ export default function LoginPage({ onLogin }) {
             {/* Password Field */}
             <div>
               <label
-                className="block text-xs font-semibold text-slate-300 mb-1"
+                className="block text-xs font-semibold text-slate-700 mb-1"
                 htmlFor="login-password"
               >
                 Password
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                   <Lock className="w-4 h-4" />
                 </div>
                 <input
@@ -102,12 +104,12 @@ export default function LoginPage({ onLogin }) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-9 pr-9 py-2 bg-slate-900/90 border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                  className="w-full pl-9 pr-9 py-2 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-200 cursor-pointer"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-700 cursor-pointer"
                 >
                   {showPassword ? (
                     <EyeOff className="w-4 h-4" />
@@ -119,13 +121,23 @@ export default function LoginPage({ onLogin }) {
             </div>
 
             {/* Security Badge */}
-            <div className="rounded-lg p-2.5 bg-slate-900/70 border border-slate-700/60 flex items-center gap-2">
+            <div className="rounded-lg p-2.5 bg-[#f7f7f7] border border-slate-200 flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span className="text-slate-300 text-[11px]">
-                Secured session with full Admin privileges and 256-bit
-                encryption.
-              </span>
+              <span className="text-slate-600 text-[11px]">
+                {isBackendConfigured
+                  ? "Sign-in is verified by the configured admin API."
+                  : "Demo mode is active. Configure the admin API for real authentication."}
+                </span>
             </div>
+
+            {error && (
+                <div
+                  role="alert"
+                  className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-200"
+                >
+                  {error}
+                </div>
+            )}
 
             {/* Submit Button */}
             <div className="pt-2">
@@ -150,7 +162,7 @@ export default function LoginPage({ onLogin }) {
 
         {/* Footer info */}
         <p className="text-center text-xs text-slate-500 mt-5">
-          E-Commerce Admin • Pakistan Region
+          SHOP.CO Admin • Pakistan Region
         </p>
       </div>
     </div>
