@@ -39,13 +39,36 @@ export default function AddProductModal({ isOpen, onClose, onSave, editingProduc
       setSizes('');
       setPrice('');
       setStock('');
-      setImage('https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=150&auto=format&fit=crop&q=80');
+      setImage('');
       setDescription('');
       setError('');
     }
   }, [editingProduct, isOpen]);
 
   if (!isOpen) return null;
+
+  const handleImageUpload = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setError('Please choose an image file.');
+      event.target.value = '';
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      setError('Image files must be 2 MB or smaller.');
+      event.target.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setImage(reader.result);
+      setError('');
+    };
+    reader.onerror = () => setError('Could not read the selected image.');
+    reader.readAsDataURL(file);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -61,6 +84,10 @@ export default function AddProductModal({ isOpen, onClose, onSave, editingProduc
     const numStock = parseInt(stock, 10);
     if (isNaN(numStock) || numStock < 0) {
       setError('Please enter a valid non-negative stock quantity.');
+      return;
+    }
+    if (!image) {
+      setError('Please upload a product image.');
       return;
     }
 
@@ -79,7 +106,7 @@ export default function AddProductModal({ isOpen, onClose, onSave, editingProduc
       price: numPrice,
       stock: numStock,
       stockStatus,
-      image: image.trim() || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=150&auto=format&fit=crop&q=80',
+      image,
       description: description.trim()
     };
 
@@ -254,19 +281,27 @@ export default function AddProductModal({ isOpen, onClose, onSave, editingProduc
             </div>
           </div>
 
-          {/* Image URL */}
+          {/* Product image upload */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1" htmlFor="product-image-input">
-              Image URL
+              Product Image {!editingProduct || !image ? '*' : ''}
             </label>
             <input
               id="product-image-input"
-              type="url"
-              value={image}
-              onChange={(e) => setImage(e.target.value)}
-              placeholder="https://images.unsplash.com/..."
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:bg-white transition-colors"
+              type="file"
+              accept="image/*"
+              required={!editingProduct || !image}
+              onChange={handleImageUpload}
+              className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700 file:mr-3 file:rounded-md file:border-0 file:bg-indigo-50 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-indigo-700 hover:file:bg-indigo-100"
             />
+            <p className="mt-1 text-[10px] text-slate-500">Upload an image up to 5 MB.</p>
+            {image && (
+              <img
+                src={image}
+                alt="Product preview"
+                className="mt-2 h-24 w-24 rounded-lg border border-slate-200 object-cover"
+              />
+            )}
           </div>
 
           {/* Description */}
